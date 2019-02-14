@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Bacteria</title>
+</head>
+<body>
+
+    <div style="z-index: 100">
+        <span>Quantidade: </span><span id="quantidade">1</span><br>
+        
+    </div>
+    <script>
+        class Bacteria{
+
+            constructor(DNA){
+
+
+
+                this.DNA=DNA;
+                this.nomeDoObjeto=DNA.nomeDoObjeto;
+                this.posX=DNA.posX;
+                this.posY=DNA.posY;
+                this.red=DNA.red;
+                this.green=DNA.green;
+                this.blue=DNA.blue
+                this.cor=`RGB(${this.red},${this.green},${this.blue})`;
+                this.tamanho=DNA.tamanho;
+                this.tamanhoInicial=DNA.tamanho;
+                this.tamanhoMaximo=DNA.tamanhoMaximo;
+                this.tipoMorfologia=DNA.tipoMorfologia;
+                this.vida=144;
+                this.born();
+
+                
+
+            }
+
+            born(){
+
+                let elemento=document.createElement("elemento");
+                elemento.id=this.nomeDoObjeto;
+                elemento.style.position="absolute";
+                elemento.style.top=this.posY+"px";
+                elemento.style.left=this.posX+"px";
+                
+
+                switch(this.tipoMorfologia) {
+                    case 'cocos':
+                        this.morfologia=`<svg height="${this.tamanho*2}" width="${this.tamanho*2}"><circle cx="${this.tamanho}" cy="${this.tamanho}" r="${this.tamanho*0.8}" stroke="black" stroke-width="3" fill="${this.cor}" /></svg>`
+                        break;
+                    case 'diplococos':
+                        this.morfologia=`<svg height="${this.tamanho*2}" width="${this.tamanho*4}">
+                            <circle cx="${this.tamanho}" cy="${this.tamanho}" r="${this.tamanho*0.8}" stroke="black" stroke-width="3" fill="${this.cor}" />
+                            <circle cx="${this.tamanho*2+this.tamanho*0.6}" cy="${this.tamanho}" r="${this.tamanho*0.8}" stroke="black" stroke-width="3" fill="${this.cor}" />
+                        </svg>`
+                        break;
+                    case 'diplococos encapsulados':
+                        this.morfologia=`<svg height="${this.tamanho*20}" width="${this.tamanho*20}">
+                            <circle cx="${this.tamanho*12}" cy="${this.tamanho*10}" r="${this.tamanho*0.8}" stroke="black" stroke-width="3" fill="${this.cor}" />
+                            <circle cx="${this.tamanho*13.7}" cy="${this.tamanho*10}" r="${this.tamanho*0.8}" stroke="black" stroke-width="3" fill="${this.cor}" />
+                            <ellipse cx="${this.tamanho*13}" cy="${this.tamanho*10}" ry="${this.tamanho*0.8*2}" rx="${this.tamanho*0.8*4}" stroke="${this.cor}" stroke-width="3" fill="none" />
+                        </svg>`
+                        break;
+                    default:
+                        this.morfologia=`<svg height="${this.tamanho*2}" width="${this.tamanho*2}"><circle cx="${this.tamanho}" cy="${this.tamanho}" r="${this.tamanho*0.8}" stroke="black" stroke-width="3" fill="${this.cor}" /></svg>`
+                }
+               
+                elemento.innerHTML=this.morfologia;
+                document.body.appendChild(elemento);
+                
+                let script=document.createElement("script");
+                script.id="Script"+this.nomeDoObjeto;
+                script.innerHTML=` setInterval(
+                    function(){
+                        ${this.nomeDoObjeto}.will();}
+                    ,100)`;
+               document.body.appendChild(script);
+
+            }
+
+
+            move(X,Y){
+
+                
+
+                document.getElementById(this.nomeDoObjeto).style.top=document.getElementById(this.nomeDoObjeto).style.top.replace("px","")*1+Y+"px";
+                document.getElementById(this.nomeDoObjeto).style.left=document.getElementById(this.nomeDoObjeto).style.left.replace("px","")*1+X+"px";
+
+            }
+
+
+            will(){
+
+                let X=Math.round(Math.random()*30-Math.random()*30);
+                let Y=Math.round(Math.random()*30-Math.random()*30);
+                
+
+
+                this.move(X,Y);
+                this.grow();
+
+            }
+
+
+            grow(){
+
+                this.tamanho=this.tamanho+1;
+                if (this.tamanho>this.tamanhoMaximo){
+
+                    this.divide();
+                } 
+
+                document.getElementById(this.nomeDoObjeto).style.transform=`scale(${this.tamanho/this.tamanhoInicial})`
+
+               
+
+            }
+
+            divide(){
+
+                let script=document.createElement("script");
+                
+                let hash=Math.round(Math.random()*10e15);
+                
+                let NovoDNA=this.DNA;
+                NovoDNA.nomeDoObjeto="Bac"+hash;
+                NovoDNA.posX=this.tamanho+this.posX;
+                NovoDNA.posY=this.tamanho+this.posY;
+                
+                NovoDNA.red=this.red*Math.random()*2;
+                NovoDNA.blue=this.blue*Math.random()*2;
+                NovoDNA.green=this.green*Math.random()*2;
+                NovoDNA.tamanho=this.tamanho/2;
+                script.innerHTML=`
+                BacDNA${hash}=${JSON.stringify(NovoDNA)};
+                Bac${hash}=new Bacteria(BacDNA${hash});
+                
+                `
+               document.body.appendChild(script);
+                this.tamanho=this.tamanho/2;
+                if (document.getElementById("quantidade").innerText*1>1500){
+                    location.reload();
+                }
+                document.getElementById("quantidade").innerText=document.getElementById("quantidade").innerText*1+1;
+                this.vida=this.vida-1;
+                if (this.vida<=0){
+                    document.getElementById("Script"+this.nomeDoObjeto).innerHTML="";
+                    document.getElementById(this.nomeDoObjeto).innerHTML="";
+                    document.getElementById("quantidade").innerText=document.getElementById("quantidade").innerText*1-1;
+                }
+            }
+
+
+
+        }
+    
+    </script>
+
+    <script>
+        
+
+        
+        var Bac1DNA={
+
+            nomeDoObjeto:"Bac1",
+            posX:800,
+            posY:500,
+            red:255,
+            green:128,
+            blue:128,
+            tamanho:30,
+            tipoMorfologia:'cocos',
+            tamanhoMaximo:40
+        }
+        
+       // Bac1=new Bacteria(Bac1DNA);
+
+        var Bac2DNA={
+
+            nomeDoObjeto:"Bac2",
+            posX:300,
+            posY:500,
+            red:128,
+            green:255,
+            blue:128,
+            tamanho:25,
+            tipoMorfologia:'cocos',
+            tamanhoMaximo:60
+        }
+
+       // Bac2=new Bacteria(Bac2DNA);
+
+        var Bac3DNA={
+
+        nomeDoObjeto:"Bac3",
+        posX:50,
+        posY:100,
+        red:128,
+        green:128,
+        blue:255,
+        tamanho:15,
+        tipoMorfologia:'cocos',
+        tamanhoMaximo:30
+        }
+
+        Bac3=new Bacteria(Bac3DNA);
+       
+        
+     
+
+       
+
+
+    </script>
+</body>
+</html>
